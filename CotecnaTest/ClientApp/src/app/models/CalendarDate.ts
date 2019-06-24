@@ -5,5 +5,5 @@ export class CalendarDate {
   mDate: moment.Moment;
   selected?: boolean;
   today?: boolean;
-  weather: DayWeather;
+  weather: DayWeather[];
 }

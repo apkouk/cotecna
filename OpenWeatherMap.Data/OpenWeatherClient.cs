@@ -55,7 +55,7 @@ namespace OpenWeatherMap.Data
                     ? forecastResponse.list.Find(x => x.dt_txt <= DateTime.Now)
                     : forecastResponse.list.Find(x => x.dt_txt >= DateTime.Now);
 
-                foreach (Forecast forecast in forecastResponse.list.FindAll(x => x.dt_txt.Hour == forecastBase.dt_txt.Hour))
+                foreach (Forecast forecast in forecastResponse.list)
                 {
                     CalendarForecast calendarForecast = new CalendarForecast
                     {

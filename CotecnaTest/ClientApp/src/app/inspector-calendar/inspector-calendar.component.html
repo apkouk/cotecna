@@ -29,7 +29,7 @@
     <div class="weeks">
       <div *ngFor="let week of weeks" class="week">
         <ng-container *ngFor="let day of week">
-          <table>
+          <table (click)="viewDay(day)">
             <tr>
               <td>
                 <div class="week-date disabled" *ngIf="!isSelectedMonth(day.mDate)">
@@ -44,10 +44,10 @@
                 </div>
               </td>
             </tr>
-            <tr>
-              <td style="text-align: -webkit-center">
-                <span class="weather-info" *ngIf="day.weather.temperature !== 0" >{{ day.weather.main + " (" + day.weather.temperature + "ºC)" }}</span>
-                <img  src="{{ day.weather.icon}}" />
+            <tr *ngIf="day.weather[0] !== undefined" >
+              <td style="text-align: -webkit-center" >
+                <span class="weather-info" >{{ day.weather[0].main + " (" + day.weather[0].temperature + "ºC)" }}</span>
+                <img  src="{{ day.weather[0].icon}}" />
               </td>
               <td>
             </tr>

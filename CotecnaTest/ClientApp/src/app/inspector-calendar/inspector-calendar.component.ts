@@ -144,11 +144,18 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     }
   }
 
-  getDayWeather(moment): DayWeather {
-    let result: DayWeather = this.weatherDays.filter(x =>
+  getDayWeather(moment): DayWeather[] {
+    let result: DayWeather[] = this.weatherDays.filter(x =>
       new Date(x.date).getDate() === moment.date() &&
-      new Date(x.date).getMonth() === moment.month())[0];
+      new Date(x.date).getMonth() === moment.month());
 
-    return result !== undefined ? result : DayWeather.createEmptyObject();
+    if (result === undefined)
+      result.push(DayWeather.createEmptyObject());
+
+    return result;
+  }
+
+  viewDay(day: DayWeather) {
+    let hola: string = "hola";
   }
 }
