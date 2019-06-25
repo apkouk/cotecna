@@ -15,7 +15,7 @@ namespace OpenWeatherMap.Service
             OpenWeatherClient = openWeatherClient;
         }
 
-        public async Task<List<CalendarForecast>> GetWeatherAsync(string cityId)
+        public async Task<ForecastResponseClient> GetWeatherAsync(string cityId)
         {
             return await OpenWeatherClient.GetWeatherAsync(cityId);
         }

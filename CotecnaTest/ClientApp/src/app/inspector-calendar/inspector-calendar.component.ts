@@ -13,6 +13,8 @@ import { Year } from "../models/Year";
 import { WeatherService } from '../services/weather/weather-service';
 import { WeatherServiceResolver } from '../services/weather/weather-service-resolver';
 import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
+import { WeatherInfo } from '../models/WeatherInfo';
+import { City } from '../models/City';
 
 @Component({
   selector: 'app-inspector-calendar',
@@ -33,7 +35,9 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   monthOptions: Month[] = [];
   selectedMonth: number;
 
-  weatherDays: DayWeather[] = [];
+  weatherDays: WeatherInfo[] = [];
+  cityInfo: City = undefined;
+  showInfo: boolean = false;
 
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
@@ -87,7 +91,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     }) > -1;
   }
 
-  isSelectedMonth(date: moment.Moment): boolean {
+  isSelectedMonth(date: moment.Moment): boolean { 
     return moment(date).isSame(this.currentDate, 'month');
   }
 
@@ -98,6 +102,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   // actions from calendar
 
   onMonthDdlChanged(month: Month): void {
+    this.showInfo = false;
     this.currentDate = moment(this.currentDate).month(((month.value) as any));
     this.generateCalendar();
   }
@@ -134,24 +139,27 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
         };
       });
   }
+  
+  // generate the weather forecast
 
   async getForecast(selectedMonth: number) {
     if (selectedMonth === new Date().getMonth()) {
+      this.showInfo = true;
       if (this.weatherDays.length === 0) {
-        this.route.data.map((data: any) => data.weatherServiceResolver).subscribe((response: DayWeather[]) => response.forEach(row => {
+        this.route.data.map((data: any) => data.weatherServiceResolver).subscribe((response: DayWeather) => response.weather.forEach(row => {
           this.weatherDays.push(row);
-        }));
+        }, this.cityInfo =  response.city ));
       }
     }
   }
 
-  getDayWeather(moment): DayWeather[] {
-    let result: DayWeather[] = this.weatherDays.filter(x =>
+  getDayWeather(moment): WeatherInfo[] {
+    let result: WeatherInfo[] = this.weatherDays.filter(x =>
       new Date(x.date).getDate() === moment.date() &&
       new Date(x.date).getMonth() === moment.month());
 
     if (result === undefined)
-      result.push(DayWeather.createEmptyObject());
+      result.push(WeatherInfo.createEmptyObject());
 
     return result;
   }
@@ -161,7 +169,8 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       this.dialog.open(DayWeatherInfoComponent, {
         data: {
           day: day.mDate,
-          data: day.weather
+          data: day.weather,
+          city: this.cityInfo
         }
       });
     }

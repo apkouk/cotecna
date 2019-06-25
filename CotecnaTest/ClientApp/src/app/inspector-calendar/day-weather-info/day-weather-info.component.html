@@ -1,7 +1,10 @@
 
-  <h1 mat-dialog-title>{{ calendarDate.day | date : "fullDate" }}</h1>
-  <div *ngFor="let dayWeather of calendarDate.data" class="week">
-    <span>{{ dayWeather.date | date : "HH:mm:ss" }} {{ dayWeather.main }} {{ "(" + dayWeather.temperature + "ºC)" }} </span>
-    <img src="{{ dayWeather.icon}}" />
-  </div>
+<span style="font-size:large">{{ calendarDate.day | date : "fullDate" }}</span>
+<br />
+<span style="font-size:medium ">{{ calendarDate.city.name }} ({{ calendarDate.city.country }})</span>
+<hr />
+<div *ngFor="let dayWeather of calendarDate.data" class="week">
+  <span>{{ dayWeather.date | date : "HH:mm:ss" }} {{ dayWeather.main }} {{ "(" + dayWeather.temperature + "ºC)" }} </span>
+  <img src="{{ dayWeather.icon}}" />
+</div>
 

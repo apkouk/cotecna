@@ -1,4 +1,4 @@
-﻿namespace OpenWeatherMapCosmosDb.Models
+﻿namespace OpenWeatherMap.Data.Models.City
 {
     public class Coord
     {

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OpenWeatherMap.Data.Models.Forecast;
 using OpenWeatherMap.Service;
+using System.Threading.Tasks;
 
 namespace CotecnaTest.Controllers
 {
@@ -21,7 +17,7 @@ namespace CotecnaTest.Controllers
         }
         
         [HttpGet("{id}")]
-        public async Task<List<CalendarForecast>> GetAsync(string id)
+        public async Task<ForecastResponseClient> GetAsync(string id)
         {
             return await _openWeatherService.GetWeatherAsync(id);
         }

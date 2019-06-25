@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenWeatherMap.Data.Models.Forecast;
-using OpenWeatherMapCosmosDb.Models;
+using OpenWeatherMap.Data.Models.City;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+
 #pragma warning disable 1998
 
 namespace OpenWeatherMap.Data
@@ -34,28 +35,30 @@ namespace OpenWeatherMap.Data
         }
 
       
-        public async Task<List<CalendarForecast>> GetWeatherAsync(string cityId)
+        public async Task<ForecastResponseClient> GetWeatherAsync(string cityId)
         {
             try
             {
-                string path = Directory.GetCurrentDirectory() + _citiesPath;
+                //string path = Directory.GetCurrentDirectory() + _citiesPath;
 
-                using (StreamReader r = new StreamReader(path))
-                {
-                    string json = r.ReadToEnd();
-                    cities = JsonConvert.DeserializeObject<List<City>>(json);
-                }
+                //using (StreamReader r = new StreamReader(path))
+                //{
+                //    string json = r.ReadToEnd();
+                //    cities = JsonConvert.DeserializeObject<List<City>>(json);
+                //}
 
-                List<CalendarForecast> result = new List<CalendarForecast>();
+                ForecastResponseClient response = new ForecastResponseClient();
 
-                string parameters = "forecast?id=" + cityId + "&units=" + units + "&APPID=";
-                ForecastResponse forecastResponse = ForecastApiCall(baseUrl, parameters, apikey);
+                string parameters = "forecast?zip=" + cityId +",es" + "&units=" + units + "&APPID=";
+                ForecastResponseApi forecastResponseApi = ForecastApiCall(baseUrl, parameters, apikey);
+
+                response.city = forecastResponseApi.city;
 
                 Forecast forecastBase = DateTime.Now.AddHours(3).Day > DateTime.Now.Day
-                    ? forecastResponse.list.Find(x => x.dt_txt <= DateTime.Now)
-                    : forecastResponse.list.Find(x => x.dt_txt >= DateTime.Now);
+                    ? forecastResponseApi.list.Find(x => x.dt_txt <= DateTime.Now)
+                    : forecastResponseApi.list.Find(x => x.dt_txt >= DateTime.Now);
 
-                foreach (Forecast forecast in forecastResponse.list)
+                foreach (Forecast forecast in forecastResponseApi.list)
                 {
                     CalendarForecast calendarForecast = new CalendarForecast
                     {
@@ -65,9 +68,9 @@ namespace OpenWeatherMap.Data
                         Description = forecast.weather[0].description,
                         Icon = imagesUrl + forecast.weather[0].icon + imagesExt
                     };
-                    result.Add(calendarForecast);
+                    response.weather.Add(calendarForecast);
                 }
-                return result;
+                return response;
             }
             catch (Exception ex)
             {
@@ -75,7 +78,7 @@ namespace OpenWeatherMap.Data
             }            
         }
 
-        private static ForecastResponse ForecastApiCall(string baseUrl, string parameters, string apikey)
+        private static ForecastResponseApi ForecastApiCall(string baseUrl, string parameters, string apikey)
         {
             WebRequest req = WebRequest.Create(baseUrl + parameters + apikey);
             req.Method = "GET";
@@ -85,10 +88,7 @@ namespace OpenWeatherMap.Data
             StreamReader sr = new StreamReader(resp.Result.GetResponseStream() ?? throw new InvalidOperationException());
 
             string json = sr.ReadToEnd();
-            ForecastResponse forecastResponse = JsonConvert.DeserializeObject<ForecastResponse>(json);
-            return forecastResponse;
+            return JsonConvert.DeserializeObject<ForecastResponseApi>(json);
         }
-
-
     }
 }

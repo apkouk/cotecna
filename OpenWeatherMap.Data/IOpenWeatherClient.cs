@@ -6,6 +6,6 @@ namespace OpenWeatherMap.Data
 {
     public interface IOpenWeatherClient
     {
-        Task<List<CalendarForecast>> GetWeatherAsync(string cityId);
+        Task<ForecastResponseClient> GetWeatherAsync(string cityId);
     }
-}
+}   

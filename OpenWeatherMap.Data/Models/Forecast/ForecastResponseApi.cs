@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace OpenWeatherMap.Data.Models.Forecast
 {
     [DataContract]
-    public class ForecastResponse
+    public class ForecastResponseApi
     {
         [DataMember]
         public string cod { get; set; }
@@ -14,5 +14,7 @@ namespace OpenWeatherMap.Data.Models.Forecast
         public int cnt { get; set; }
         [DataMember]
         public List<Forecast> list { get; set; }
+        [DataMember]
+        public City.City city { get; set; }
     }
 }

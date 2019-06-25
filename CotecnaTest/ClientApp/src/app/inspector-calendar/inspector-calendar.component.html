@@ -1,5 +1,6 @@
 <br />
 <br />
+
 <div class="calendar">
   <div class="calendar-navs">
     <div class="month-nav">
@@ -20,7 +21,6 @@
         </mat-select>
       </mat-form-field>
     </div>
-
   </div>
   <div class="month-grid">
     <div class="day-names">
@@ -31,7 +31,7 @@
     <div class="weeks">
       <div *ngFor="let week of weeks" class="week">
         <ng-container *ngFor="let day of week">
-          <table style="cursor:pointer;"  (click)="viewDay(day)">
+          <table style="cursor:pointer;" (click)="viewDay(day)">
             <tr>
               <td>
                 <div class="week-date disabled" *ngIf="!isSelectedMonth(day.mDate)">
@@ -58,8 +58,10 @@
       </div>
     </div>
   </div>
-  <div class="calendar-info">
-    <span>* click on the weather to display forecast details</span>
+
+  <div class="calendar-info" *ngIf="showInfo">
+    <span>* click on the weather to display forecast details</span><br />
+    <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
   </div>
 </div>
 

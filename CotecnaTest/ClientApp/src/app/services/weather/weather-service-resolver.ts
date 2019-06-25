@@ -13,7 +13,7 @@ export class WeatherServiceResolver implements Resolve<any> {
   constructor(private weatherService: WeatherService) {
   }
 
-  resolve(route: ActivatedRouteSnapshot): Observable<DayWeather[]> {
+  resolve(route: ActivatedRouteSnapshot): Observable<DayWeather> {
     return this.weatherService.getFiveDayForecast();
   }
 }
