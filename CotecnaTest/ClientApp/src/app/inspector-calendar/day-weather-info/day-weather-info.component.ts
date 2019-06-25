@@ -6,8 +6,7 @@ import { CalendarDate } from "../../models/CalendarDate";
 
 @Component({
   selector: 'day-weather-info',
-  templateUrl: './day-weather-info.component.html',
-  styleUrls: ['./day-weather-info.component.scss']
+  templateUrl: './day-weather-info.component.html'
 })
 
 export class DayWeatherInfoComponent {
