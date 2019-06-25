@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from "lodash";
 import * as moment from 'moment';
+import 'rxjs/add/operator/finally';
 import { months } from "../../data/month-data";
 import { CalendarDate } from "../models/CalendarDate";
 import { DayWeather } from '../models/DayWeather';
@@ -10,14 +12,13 @@ import { Month } from "../models/Month";
 import { Year } from "../models/Year";
 import { WeatherService } from '../services/weather/weather-service';
 import { WeatherServiceResolver } from '../services/weather/weather-service-resolver';
-import { ActivatedRoute } from '@angular/router';
-import 'rxjs/add/operator/finally';
+import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 
 @Component({
   selector: 'app-inspector-calendar',
   templateUrl: './inspector-calendar.component.html',
   styleUrls: ['./inspector-calendar.component.scss'],
-  providers: [WeatherService, WeatherServiceResolver]
+  providers: [WeatherService, WeatherServiceResolver, MatDialog]
 })
 
 export class InspectorCalendarComponent implements OnInit, OnChanges {
@@ -37,7 +38,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
 
-  public constructor(private titleService: Title, public router: Router, private route: ActivatedRoute) { }
+  public constructor(private titleService: Title, public router: Router, private route: ActivatedRoute, public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
@@ -155,7 +156,11 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     return result;
   }
 
-  viewDay(day: DayWeather) {
-    let hola: string = "hola";
+  viewDay(day: CalendarDate) {
+    if (day.weather.length !== 0) {
+      this.dialog.open(DayWeatherInfoComponent, {
+        data: day
+      });
+    }
   }
 }
