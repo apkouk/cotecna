@@ -159,7 +159,10 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   viewDay(day: CalendarDate) {
     if (day.weather.length !== 0) {
       this.dialog.open(DayWeatherInfoComponent, {
-        data: day
+        data: {
+          day: day.mDate,
+          data: day.weather
+        }
       });
     }
   }

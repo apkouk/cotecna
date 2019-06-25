@@ -1,61 +1,7 @@
-HOLA QUE TAL
 
-<!--<div class="calendar">
-  <div class="calendar-navs">
-    <div class="month-nav">
-      <mat-form-field>
-        <mat-label>Year</mat-label>
-        <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearDdlChanged($event)">
-          <mat-option *ngFor="let year of yearOptions" [value]="year.value">
-            {{year.viewValue}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Month</mat-label>
-        <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthDdlChanged($event)">
-          <mat-option *ngFor="let month of monthOptions" [value]="month.value">
-            {{month.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+  <h1 mat-dialog-title>{{ calendarDate.day | date : "fullDate" }}</h1>
+  <div *ngFor="let dayWeather of calendarDate.data" class="week">
+    <span>{{ dayWeather.date | date : "HH:mm:ss" }} {{ dayWeather.main }} {{ "(" + dayWeather.temperature + "ºC)" }} </span>
+    <img src="{{ dayWeather.icon}}" />
+  </div>
 
-  </div>
-  <div class="month-grid">
-    <div class="day-names">
-      <div *ngFor="let name of dayNames" class="day-name p9 day-name-header">
-        {{ name }}
-      </div>
-    </div>
-    <div class="weeks">
-      <div *ngFor="let week of weeks" class="week">
-        <ng-container *ngFor="let day of week">
-          <table (click)="viewDay(day)">
-            <tr>
-              <td>
-                <div class="week-date disabled" *ngIf="!isSelectedMonth(day.mDate)">
-                  <span class="">{{ day.mDate.date() }}</span>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="week-date enabled" *ngIf="isSelectedMonth(day.mDate)" (click)="selectDate(day)" [ngClass]="{ today: day.today, selected: day.selected }">
-                  <span class="">{{ day.mDate.date() }}</span>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="day.weather[0] !== undefined" >
-              <td style="text-align: -webkit-center" >
-                <span class="weather-info" >{{ day.weather[0].main + " (" + day.weather[0].temperature + "ºC)" }}</span>
-                <img  src="{{ day.weather[0].icon}}" />
-              </td>
-              <td>
-            </tr>
-          </table>
-        </ng-container>
-      </div>
-    </div>
-  </div>
-</div>-->

@@ -11,5 +11,5 @@ import { CalendarDate } from "../../models/CalendarDate";
 })
 
 export class DayWeatherInfoComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: CalendarDate) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public calendarDate: any) { }
 }
