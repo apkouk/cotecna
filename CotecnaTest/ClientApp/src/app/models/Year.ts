@@ -1,10 +1,10 @@
 export class Year {
-  value: string;
-  viewValue: string;
+  value: number;
+  viewValue: number;
 
   constructor(value: number, viewValue: number) {
-    this.value = value.toString();
-    this.viewValue = viewValue.toString();
+    this.value = value;
+    this.viewValue = viewValue;
   }
 
 }

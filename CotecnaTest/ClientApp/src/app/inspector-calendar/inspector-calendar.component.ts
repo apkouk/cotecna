@@ -30,7 +30,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   sortedDates: CalendarDate[] = [];
 
   yearOptions: Year[] = [];
-  selectedYear: string = "";
+  selectedYear: number;
 
   monthOptions: Month[] = [];
   selectedMonth: number;
@@ -66,7 +66,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       let year: Year = new Year(firstYear + i, firstYear + i);
       result.push(year);
 
-      if (year.value === currentYear.toString())
+      if (year.value === currentYear)
         this.selectedYear = year.value;
     }
 
