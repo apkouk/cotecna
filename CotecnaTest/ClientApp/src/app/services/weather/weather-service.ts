@@ -9,14 +9,21 @@ import { Service } from '../service.base';
 export class WeatherService extends Service {
 
   //Default is Barcelona
-  public cityId: string = "08930";
+  public zipCode: string; 
+  public posLon: number;
+  public posLat: number;
 
   constructor(http: HttpClient) {
     super(http, '/api/weather/');
+    this.zipCode = "36201";
   }
 
-  public getFiveDayForecast(): Observable<DayWeather> {
-    return this.http.get<DayWeather>(this.baseUrl + this.cityId);
+  public getWeatherByZipCode(): Observable<DayWeather> {
+    return this.http.get<DayWeather>(this.baseUrl + this.zipCode);
   };
+
+  //public getWeatherByLocation(): Observable<DayWeather> {
+  //  return this.http.get<DayWeather>(this.baseUrl + "lon/" + this.posLon + "/lat/" + this.posLat);
+  //};
 }
 

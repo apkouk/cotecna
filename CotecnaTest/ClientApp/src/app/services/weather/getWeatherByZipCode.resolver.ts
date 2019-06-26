@@ -8,12 +8,12 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 
-export class WeatherServiceResolver implements Resolve<any> {
+export class GetWeatherByZipCodeService implements Resolve<any> {
 
   constructor(private weatherService: WeatherService) {
   }
 
   resolve(route: ActivatedRouteSnapshot): Observable<DayWeather> {
-    return this.weatherService.getFiveDayForecast();
+    return this.weatherService.getWeatherByZipCode();
   }
 }

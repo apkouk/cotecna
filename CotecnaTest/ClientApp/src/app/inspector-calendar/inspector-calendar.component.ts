@@ -11,7 +11,8 @@ import { DayWeather } from '../models/DayWeather';
 import { Month } from "../models/Month";
 import { Year } from "../models/Year";
 import { WeatherService } from '../services/weather/weather-service';
-import { WeatherServiceResolver } from '../services/weather/weather-service-resolver';
+import { GetWeatherByZipCodeService } from '../services/weather/getWeatherByZipCode.resolver';
+//import { GetWeatherByLocationService } from '../services/weather/getWeatherByLocation.resolver';
 import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 import { WeatherInfo } from '../models/WeatherInfo';
 import { City } from '../models/City';
@@ -20,7 +21,7 @@ import { City } from '../models/City';
   selector: 'app-inspector-calendar',
   templateUrl: './inspector-calendar.component.html',
   styleUrls: ['./inspector-calendar.component.scss'],
-  providers: [WeatherService, WeatherServiceResolver, MatDialog]
+  providers: [WeatherService, GetWeatherByZipCodeService, MatDialog]
 })
 
 export class InspectorCalendarComponent implements OnInit, OnChanges {
@@ -42,7 +43,11 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
 
-  public constructor(private titleService: Title, public router: Router, private route: ActivatedRoute, public dialog: MatDialog) { }
+  public constructor(private titleService: Title,
+    public router: Router,
+    private route: ActivatedRoute,
+    public dialog: MatDialog,
+    public weatherService: WeatherService) {}
 
   ngOnInit(): void {
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
@@ -91,7 +96,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     }) > -1;
   }
 
-  isSelectedMonth(date: moment.Moment): boolean { 
+  isSelectedMonth(date: moment.Moment): boolean {
     return moment(date).isSame(this.currentDate, 'month');
   }
 
@@ -139,16 +144,24 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
         };
       });
   }
-  
+
   // generate the weather forecast
 
   async getForecast(selectedMonth: number) {
     if (selectedMonth === new Date().getMonth()) {
       this.showInfo = true;
+
+      //TODO Improve this if else
       if (this.weatherDays.length === 0) {
-        this.route.data.map((data: any) => data.weatherServiceResolver).subscribe((response: DayWeather) => response.weather.forEach(row => {
-          this.weatherDays.push(row);
-        }, this.cityInfo =  response.city ));
+        if (this.weatherService.posLat === undefined) {
+          this.route.data.map((data: any) => data.getWeatherByZipCodeService).subscribe((response: DayWeather) => response.weather.forEach(row => {
+            this.weatherDays.push(row);
+          }, this.cityInfo = response.city));
+        }
+      } else {
+        //this.route.data.map((data: any) => data.getWeatherByLocationService).subscribe((response: DayWeather) => response.weather.forEach(row => {
+        //  this.weatherDays.push(row);
+        //}, this.cityInfo = response.city));
       }
     }
   }
@@ -175,4 +188,13 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       });
     }
   }
+
+  getLocationBrowser() {
+    navigator.geolocation.getCurrentPosition(position => {
+      this.weatherService.posLat = position.coords.latitude;
+      this.weatherService.posLon = position.coords.longitude;
+      this.generateCalendar();
+    });
+  }
+
 }
