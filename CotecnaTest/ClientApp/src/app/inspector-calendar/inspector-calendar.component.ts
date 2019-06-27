@@ -192,7 +192,6 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     this.showWeatherControls = false;
     this.currentDate = moment(this.currentDate).month(((month.value) as any));
     this.generateCalendar();
-
   }
 
   onYearDdlChanged(year: Year): void {
