@@ -1,11 +1,12 @@
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { MatDialogModule } from '@angular/material';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
@@ -27,9 +28,11 @@ import { GetWeatherByLocationService } from './services/weather/getWeatherByLoca
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     MatSelectModule,
     MatDialogModule,
     MatIconModule,
+    MatInputModule,
     RouterModule.forRoot([
       {
         path: '', component: InspectorCalendarComponent,

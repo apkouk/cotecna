@@ -16,6 +16,7 @@ import { GetWeatherByLocationService } from '../services/weather/getWeatherByLoc
 import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 import { WeatherInfo } from '../models/WeatherInfo';
 import { City } from '../models/City';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-inspector-calendar',
@@ -37,12 +38,16 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   selectedMonth: number;
 
   weatherDays: WeatherInfo[] = [];
-  weatherLocationDays: WeatherInfo[] = [];
+  weatherResponse: WeatherInfo[] = [];
   cityInfo: City = undefined;
   showInfo: boolean = false;
+  findByLocation: boolean = false;
+  findByZipCode: boolean = true;
 
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
+
+  zipcode = new FormControl();
 
   public constructor(private titleService: Title,
     public router: Router,
@@ -52,7 +57,9 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.weatherService.zipCode = "36201";
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
+    this.getDataResolver();
     this.generateCalendar();
     this.yearOptions = this.loadYearsDdl();
     this.monthOptions = this.loadMonthsDdl();
@@ -60,6 +67,12 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.generateCalendar();
+  }
+
+  getDataResolver() {
+    this.route.data.map((data: any) => data.getWeatherByZipCodeService).subscribe((response: DayWeather) => response.weather.forEach(row => {
+      this.weatherDays.push(row);
+    }, this.cityInfo = response.city));
   }
 
   // load dropdowns
@@ -106,36 +119,25 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     this.onSelectDate.emit(date);
   }
 
-  // actions from calendar
-
-  onMonthDdlChanged(month: Month): void {
-    this.showInfo = false;
-    this.currentDate = moment(this.currentDate).month(((month.value) as any));
-    this.generateCalendar();
-  }
-
-  onYearDdlChanged(year: Year): void {
-    this.currentDate = moment(this.currentDate).year(((year.value) as any));
-    this.generateCalendar();
-  }
-
   // generate the calendar grid
 
   generateCalendar(): void {
-    const dates = this.fillDates(this.currentDate);
-    const weeks: CalendarDate[][] = [];
-    while (dates.length > 0) {
-      weeks.push(dates.splice(0, 7));
-    }
-    this.weeks = weeks;
+    this.getForecast(this.currentDate.month()).then(() => {
+      let dates = this.fillDates(this.currentDate);
+      let weeks: CalendarDate[][] = [];
+      while (dates.length > 0) {
+        weeks.push(dates.splice(0, 7));
+      }
+      this.weeks = weeks;
+    });
   }
 
   fillDates(currentMoment: moment.Moment): CalendarDate[] {
+    let result: CalendarDate[] = [];
     const firstOfMonth = moment(currentMoment).startOf('month').day() - 1;
     const firstDayOfGrid = moment(currentMoment).startOf('month').subtract(firstOfMonth, 'days');
-    this.getForecast(this.currentDate.month());
     const start = firstDayOfGrid.date();
-    return _.range(start, start + 42)
+    result = _.range(start, start + 42)
       .map((date: number): CalendarDate => {
         const d = moment(firstDayOfGrid).date(date);
         return {
@@ -145,6 +147,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
           weather: this.getDayWeather(d)
         };
       });
+    return result;
   }
 
   // generate the weather forecast
@@ -152,37 +155,26 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   async getForecast(selectedMonth: number) {
     if (selectedMonth === new Date().getMonth()) {
       this.showInfo = true;
+      this.weatherResponse = [];
 
-      //TODO Improve this if else
-      if (this.weatherDays.length === 0) {
-        if (this.weatherService.posLat === undefined) {
-          this.route.data.map((data: any) => data.getWeatherByZipCodeService).subscribe((response: DayWeather) => response.weather.forEach(row => {
-            this.weatherDays.push(row);
-          }, this.cityInfo = response.city));
-        }
-      } else {
-        this.weatherLocationDays = [];
-        await this.weatherService.getWeatherByLocation().toPromise().then((response: DayWeather) => response.weather.forEach(row => {
-          this.weatherLocationDays.push(row);
-        }, this.cityInfo = response.city));
-        this.weatherDays = this.weatherLocationDays;
-        //this.weatherLocationDays = [];
-        //await this.weatherService.getWeatherByLocation().subscribe((response: DayWeather) => response.weather.forEach(row => {
-        //  this.weatherLocationDays.push(row);
-        //}, this.cityInfo = response.city), (error) => console.log(error), (() => {
-        //    this.weatherDays = this.weatherLocationDays; this.fillDates(this.currentDate)}) as any );
-
-        //this.route.data.map((data: any) => data.getWeatherByLocationService).subscribe((response: DayWeather) => response.weather.forEach(row => {
-        //  this.weatherDays.push(row);
-        //}, this.cityInfo = response.city));
+      if (this.findByZipCode) {
+        await this.weatherService.getWeatherByZipCode().toPromise()
+          .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city))
+          .catch(err => alert(err));
+        this.findByZipCode = false;
       }
+
+      if (this.findByLocation) {
+        await this.weatherService.getWeatherByLocation().toPromise()
+          .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city));
+        this.findByLocation = false;
+      }
+
+      this.weatherDays = this.weatherResponse;
     }
   }
 
   getDayWeather(moment): WeatherInfo[] {
-    if (this.weatherLocationDays.length > 0)
-      this.weatherDays = this.weatherLocationDays;
-
     let result: WeatherInfo[] = this.weatherDays.filter(x =>
       new Date(x.date).getDate() === moment.date() &&
       new Date(x.date).getMonth() === moment.month());
@@ -191,6 +183,20 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       result.push(WeatherInfo.createEmptyObject());
 
     return result;
+  }
+
+  // events
+
+  onMonthDdlChanged(month: Month): void {
+    this.showInfo = false;
+    this.currentDate = moment(this.currentDate).month(((month.value) as any));
+    this.generateCalendar();
+
+  }
+
+  onYearDdlChanged(year: Year): void {
+    this.currentDate = moment(this.currentDate).year(((year.value) as any));
+    this.generateCalendar();
   }
 
   viewDay(day: CalendarDate) {
@@ -209,7 +215,17 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     navigator.geolocation.getCurrentPosition(position => {
       this.weatherService.posLat = position.coords.latitude;
       this.weatherService.posLon = position.coords.longitude;
+      this.findByLocation = true;
       this.generateCalendar();
     });
+  }
+
+  getWeatherByZipCode() {
+    this.showInfo = false;
+    if (this.zipcode.value !== null) {
+      this.weatherService.zipCode = this.zipcode.value;
+      this.findByZipCode = true;
+      this.generateCalendar();
+    }
   }
 }
