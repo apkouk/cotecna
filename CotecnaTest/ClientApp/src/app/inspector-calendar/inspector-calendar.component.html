@@ -20,14 +20,15 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field style="    margin-left: 50px;" *ngIf="showInfo">
-        <input matInput placeholder="Spanish Zip Code" [formControl]="zipcode">
+      <mat-form-field style="margin-left: 50px; width:200px !important" *ngIf="showWeatherControls">
+        <input matInput placeholder="Spanish Zip Code" [formControl]="zipcodeControl">
+        <mat-hint *ngIf="showZipCodeError" style="color:red">Valid spanish zip code <strong>required</strong></mat-hint>        
       </mat-form-field>
-      <div *ngIf="showInfo">
+      <div *ngIf="showWeatherControls">
         <button mat-button (click)="getWeatherByZipCode()" class="location-btn"><mat-icon aria-hidden="True">search</mat-icon></button>
       </div>
     </div>
-    <div style="float: right" title="Get your current location to show weather" *ngIf="showInfo">
+    <div style="float: right" title="Get your current location to show weather" *ngIf="showWeatherControls">
       <button mat-button (click)="getLocationBrowser()" class="location-btn"><mat-icon aria-hidden="True" aria-label="Use current location">location_on</mat-icon></button>
     </div>
   </div>
@@ -68,7 +69,7 @@
     </div>
   </div>
 
-  <div class="calendar-info" *ngIf="showInfo">
+  <div class="calendar-info" *ngIf="showWeatherControls">
     <span>* click on the weather to display forecast details</span><br />
     <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
   </div>

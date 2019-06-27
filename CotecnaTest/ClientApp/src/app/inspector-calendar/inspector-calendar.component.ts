@@ -40,14 +40,15 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   weatherDays: WeatherInfo[] = [];
   weatherResponse: WeatherInfo[] = [];
   cityInfo: City = undefined;
-  showInfo: boolean = false;
+  showWeatherControls: boolean = false;
   findByLocation: boolean = false;
   findByZipCode: boolean = true;
 
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
 
-  zipcode = new FormControl();
+  zipcodeControl = new FormControl();
+  showZipCodeError: boolean = false;
 
   public constructor(private titleService: Title,
     public router: Router,
@@ -154,13 +155,13 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   async getForecast(selectedMonth: number) {
     if (selectedMonth === new Date().getMonth()) {
-      this.showInfo = true;
+      this.showWeatherControls = true;
       this.weatherResponse = [];
 
       if (this.findByZipCode) {
         await this.weatherService.getWeatherByZipCode().toPromise()
           .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city))
-          .catch(err => alert(err));
+          .catch(() => { this.showZipCodeError = true; });
         this.findByZipCode = false;
       }
 
@@ -188,7 +189,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   // events
 
   onMonthDdlChanged(month: Month): void {
-    this.showInfo = false;
+    this.showWeatherControls = false;
     this.currentDate = moment(this.currentDate).month(((month.value) as any));
     this.generateCalendar();
 
@@ -221,11 +222,15 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   }
 
   getWeatherByZipCode() {
-    this.showInfo = false;
-    if (this.zipcode.value !== null) {
-      this.weatherService.zipCode = this.zipcode.value;
+    this.showZipCodeError = false;
+    if (this.zipcodeControl.value !== null && this.zipcodeControl.value !== "") {
+      this.weatherService.zipCode = this.zipcodeControl.value;
       this.findByZipCode = true;
       this.generateCalendar();
     }
+    else {
+      this.showZipCodeError = true;
+    }
   }
+
 }
