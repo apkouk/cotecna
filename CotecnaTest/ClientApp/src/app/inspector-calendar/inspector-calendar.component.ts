@@ -41,6 +41,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   weatherResponse: WeatherInfo[] = [];
   cityInfo: City = undefined;
   showWeatherControls: boolean = false;
+
   findByLocation: boolean = false;
   findByZipCode: boolean = true;
 
@@ -197,7 +198,13 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   onYearDdlChanged(year: Year): void {
     this.currentDate = moment(this.currentDate).year(((year.value) as any));
-    this.generateCalendar();
+    if (this.selectedYear !== new Date().getFullYear() || this.selectedMonth !== new Date().getMonth())  {
+      this.showWeatherControls = false;
+    } else {
+      this.showWeatherControls = true;
+      this.findByZipCode = true;
+      this.generateCalendar();
+    }
   }
 
   viewDay(day: CalendarDate) {
