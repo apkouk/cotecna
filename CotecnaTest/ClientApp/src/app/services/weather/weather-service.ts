@@ -22,8 +22,9 @@ export class WeatherService extends Service {
     return this.http.get<DayWeather>(this.baseUrl + this.zipCode);
   };
 
-  //public getWeatherByLocation(): Observable<DayWeather> {
-  //  return this.http.get<DayWeather>(this.baseUrl + "lon/" + this.posLon + "/lat/" + this.posLat);
-  //};
+  public getWeatherByLocation(): Observable<DayWeather> {
+    if (this.posLon !== undefined && this.posLat !== undefined)
+      return this.http.get<DayWeather>(this.baseUrl + "?lon=" + this.posLon + "&lat=" + this.posLat);
+  };
 }
 

@@ -12,7 +12,7 @@ import { Month } from "../models/Month";
 import { Year } from "../models/Year";
 import { WeatherService } from '../services/weather/weather-service';
 import { GetWeatherByZipCodeService } from '../services/weather/getWeatherByZipCode.resolver';
-//import { GetWeatherByLocationService } from '../services/weather/getWeatherByLocation.resolver';
+import { GetWeatherByLocationService } from '../services/weather/getWeatherByLocation.resolver';
 import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 import { WeatherInfo } from '../models/WeatherInfo';
 import { City } from '../models/City';
@@ -21,7 +21,7 @@ import { City } from '../models/City';
   selector: 'app-inspector-calendar',
   templateUrl: './inspector-calendar.component.html',
   styleUrls: ['./inspector-calendar.component.scss'],
-  providers: [WeatherService, GetWeatherByZipCodeService, MatDialog]
+  providers: [WeatherService, GetWeatherByZipCodeService, GetWeatherByLocationService, MatDialog]
 })
 
 export class InspectorCalendarComponent implements OnInit, OnChanges {
@@ -37,6 +37,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   selectedMonth: number;
 
   weatherDays: WeatherInfo[] = [];
+  weatherLocationDays: WeatherInfo[] = [];
   cityInfo: City = undefined;
   showInfo: boolean = false;
 
@@ -47,7 +48,8 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     public router: Router,
     private route: ActivatedRoute,
     public dialog: MatDialog,
-    public weatherService: WeatherService) {}
+    public weatherService: WeatherService) {
+  }
 
   ngOnInit(): void {
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
@@ -159,6 +161,17 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
           }, this.cityInfo = response.city));
         }
       } else {
+        this.weatherLocationDays = [];
+        await this.weatherService.getWeatherByLocation().toPromise().then((response: DayWeather) => response.weather.forEach(row => {
+          this.weatherLocationDays.push(row);
+        }, this.cityInfo = response.city));
+        this.weatherDays = this.weatherLocationDays;
+        //this.weatherLocationDays = [];
+        //await this.weatherService.getWeatherByLocation().subscribe((response: DayWeather) => response.weather.forEach(row => {
+        //  this.weatherLocationDays.push(row);
+        //}, this.cityInfo = response.city), (error) => console.log(error), (() => {
+        //    this.weatherDays = this.weatherLocationDays; this.fillDates(this.currentDate)}) as any );
+
         //this.route.data.map((data: any) => data.getWeatherByLocationService).subscribe((response: DayWeather) => response.weather.forEach(row => {
         //  this.weatherDays.push(row);
         //}, this.cityInfo = response.city));
@@ -167,6 +180,9 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   }
 
   getDayWeather(moment): WeatherInfo[] {
+    if (this.weatherLocationDays.length > 0)
+      this.weatherDays = this.weatherLocationDays;
+
     let result: WeatherInfo[] = this.weatherDays.filter(x =>
       new Date(x.date).getDate() === moment.date() &&
       new Date(x.date).getMonth() === moment.month());
@@ -196,5 +212,4 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       this.generateCalendar();
     });
   }
-
 }

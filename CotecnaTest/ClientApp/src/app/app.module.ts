@@ -13,7 +13,7 @@ import { InspectorCalendarComponent } from './inspector-calendar/inspector-calen
 import { DayWeatherInfoComponent } from './inspector-calendar/day-weather-info/day-weather-info.component'
 import { WeatherService } from 'src/app/services/weather/weather-service';
 import { GetWeatherByZipCodeService } from './services/weather/getWeatherByZipCode.resolver';
-//import { GetWeatherByLocationService } from './services/weather/getWeatherByLocation.resolver';
+import { GetWeatherByLocationService } from './services/weather/getWeatherByLocation.resolver';
 
 @NgModule({
   declarations: [
@@ -34,11 +34,12 @@ import { GetWeatherByZipCodeService } from './services/weather/getWeatherByZipCo
       {
         path: '', component: InspectorCalendarComponent,
         pathMatch: 'full',
-        resolve: { getWeatherByZipCodeService: GetWeatherByZipCodeService }
+        resolve: { getWeatherByZipCodeService: GetWeatherByZipCodeService, getWeatherByLocationService: GetWeatherByLocationService }
+        
       }
     ])
   ],
-  providers: [Title, WeatherService, GetWeatherByZipCodeService],
+  providers: [Title, WeatherService, GetWeatherByZipCodeService, GetWeatherByLocationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

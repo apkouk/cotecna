@@ -6,6 +6,7 @@ namespace OpenWeatherMap.Service
 {
     public interface IOpenWeatherService
     {
-        Task<ForecastResponseClient> GetWeatherAsync(string cityId);
+        Task<ForecastResponseClient> GetWeatherByZipCodeAsync(string zipCode);
+        Task<ForecastResponseClient> GetWeatherByLocationAsync(string lon, string lat);
     }
 }

@@ -14,10 +14,15 @@ namespace OpenWeatherMap.Service
         {
             OpenWeatherClient = openWeatherClient;
         }
-
-        public async Task<ForecastResponseClient> GetWeatherAsync(string cityId)
+  
+        public async Task<ForecastResponseClient> GetWeatherByZipCodeAsync(string zipCode)
         {
-            return await OpenWeatherClient.GetWeatherAsync(cityId);
+            return await OpenWeatherClient.GetWeatherByZipCodeAsync(zipCode);
+        }
+
+        public async Task<ForecastResponseClient> GetWeatherByLocationAsync(string lon, string lat)
+        {
+            return await OpenWeatherClient.GetWeatherByLocationAsync(lon, lat);
         }
     }
 }

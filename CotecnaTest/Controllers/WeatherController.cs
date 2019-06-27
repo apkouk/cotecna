@@ -16,10 +16,16 @@ namespace CotecnaTest.Controllers
             _openWeatherService = openWeatherService;
         }
         
-        [HttpGet("{id}")]
-        public async Task<ForecastResponseClient> GetAsync(string id)
+        [HttpGet("{zipCode}")]
+        public async Task<ForecastResponseClient> GetAsync(string zipCode)
         {
-            return await _openWeatherService.GetWeatherAsync(id);
+            return await _openWeatherService.GetWeatherByZipCodeAsync(zipCode);
+        }
+
+        [HttpGet]
+        public async Task<ForecastResponseClient> GetByLocation([FromQuery]string lon, [FromQuery]string lat)
+        {
+            return await _openWeatherService.GetWeatherByLocationAsync(lon, lat);
         }
     }
 }
