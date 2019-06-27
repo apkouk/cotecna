@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using OpenWeatherMap.Data.Models.City;
 namespace OpenWeatherMap.Data.Models.Forecast
 {
     [DataContract]
