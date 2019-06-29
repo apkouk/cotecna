@@ -69,9 +69,11 @@
     </div>
   </div>
 
-  <div class="calendar-info" *ngIf="cityInfo !== undefined && showWeatherControls" >
+  <div class="calendar-info" *ngIf="showWeatherControls" >
     <span>* click on the weather to display forecast details</span><br />
-    <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
+    <div *ngIf="cityInfo.name !== ''">
+      <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
+    </div>
   </div>
 </div>
 
