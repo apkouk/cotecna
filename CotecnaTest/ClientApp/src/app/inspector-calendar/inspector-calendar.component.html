@@ -58,8 +58,8 @@
             </tr>
             <tr *ngIf="day.weather[0] !== undefined && showWeatherControls && day.weather[0].temperature !== 0">
               <td style="text-align: -webkit-center">
-                <span class="weather-info">{{ day.weather[0].main + " (" + day.weather[0].temperature + "ºC)" }}</span>
-                <img src="{{ day.weather[0].icon}}" />
+                <span *ngIf="day.currentWeather !== undefined" class="weather-info">{{ day.currentWeather.main + " (" + day.currentWeather.temperature + "ºC)" }}</span>
+                <img src="{{ day.currentWeather.icon}}" />
               </td>
               <td>
             </tr>

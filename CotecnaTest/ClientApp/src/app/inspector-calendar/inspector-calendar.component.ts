@@ -69,7 +69,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.getLocationBrowser();
   }
-  
+
   // load dropdowns
 
   loadYearsDdl(): Year[] {
@@ -119,7 +119,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
     this.showWeatherControls = result;
     return result;
   }
-  
+
   // generate the calendar grid
 
   initCalendar() {
@@ -142,7 +142,8 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
           today: this.isToday(d),
           selected: this.isSelected(d),
           mDate: d,
-          weather: this.getDayWeather(d)
+          weather: this.getDayWeather(d),
+          currentWeather: this.getCurrentWeather(d)
         };
       });
     return result;
@@ -182,6 +183,14 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
     return result;
   }
 
+  getCurrentWeather(moment): WeatherInfo {
+    return this.weatherDays.find(x =>
+      new Date(x.date).getDate() === moment.date() &&
+      new Date(x.date).getMonth() === moment.month() &&
+      new Date(x.date).getHours() < new Date().getHours() &&
+      new Date().getHours() < new Date(x.date).getHours() + 3);
+  }
+
   // events
 
   onMonthDdlChanged(month: Month): void {
@@ -215,17 +224,17 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
         this.getForecastLocation().then(() => {
           this.initCalendar();
         });
-        
+
       },
       () => {
         //TODO Change icon styles to make show it as a disabled
-        alert('Location permission blocked. Use zip code textbox to load forecast!'); 
+        alert('Location permission blocked. Use zip code textbox to load forecast!');
       });
   }
 
   getWeatherByZipCode() {
     this.zipcodeControl.value !== null && this.zipcodeControl.value !== ""
-      ? this.getForecastZipCode().then(() => {this.initCalendar(); })
+      ? this.getForecastZipCode().then(() => { this.initCalendar(); })
       : this.showZipCodeError = true;
   }
 
