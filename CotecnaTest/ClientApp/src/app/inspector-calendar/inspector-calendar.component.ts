@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,16 +8,15 @@ import * as moment from 'moment';
 import 'rxjs/add/operator/finally';
 import { months } from "../../data/month-data";
 import { CalendarDate } from "../models/CalendarDate";
+import { City } from '../models/City';
 import { DayWeather } from '../models/DayWeather';
 import { Month } from "../models/Month";
-import { Year } from "../models/Year";
-import { WeatherService } from '../services/weather/weather-service';
-import { GetWeatherByZipCodeService } from '../services/weather/getWeatherByZipCode.resolver';
-import { GetWeatherByLocationService } from '../services/weather/getWeatherByLocation.resolver';
-import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 import { WeatherInfo } from '../models/WeatherInfo';
-import { City } from '../models/City';
-import { FormControl } from '@angular/forms';
+import { Year } from "../models/Year";
+import { GetWeatherByLocationService } from '../services/weather/getWeatherByLocation.resolver';
+import { GetWeatherByZipCodeService } from '../services/weather/getWeatherByZipCode.resolver';
+import { WeatherService } from '../services/weather/weather-service';
+import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.component';
 
 @Component({
   selector: 'app-inspector-calendar',
@@ -25,7 +25,8 @@ import { FormControl } from '@angular/forms';
   providers: [WeatherService, GetWeatherByZipCodeService, GetWeatherByLocationService, MatDialog]
 })
 
-export class InspectorCalendarComponent implements OnInit, OnChanges {
+export class InspectorCalendarComponent implements OnInit, AfterViewInit {
+
   currentDate = moment();
   dayNames = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
   weeks: CalendarDate[][] = [];
@@ -40,7 +41,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   weatherDays: WeatherInfo[] = [];
   weatherResponse: WeatherInfo[] = [];
   cityInfo: City = new City(0, "", "", undefined);
-  showWeatherControls: boolean = false;
+  showWeatherControls: boolean = true;
 
   findByLocation: boolean = true;
   findByZipCode: boolean = false;
@@ -60,14 +61,13 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
-    this.getLocationBrowser();
-  
     this.yearOptions = this.loadYearsDdl();
     this.monthOptions = this.loadMonthsDdl();
+    this.initCalendar();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.generateCalendar();
+  ngAfterViewInit(): void {
+    this.getLocationBrowser();
   }
   
   // load dropdowns
@@ -114,29 +114,28 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     this.onSelectDate.emit(date);
   }
 
+  isCurrentYearAndMonth(): boolean {
+    let result: boolean = this.selectedYear === new Date().getFullYear() && this.selectedMonth === new Date().getMonth();
+    this.showWeatherControls = result;
+    return result;
+  }
+  
   // generate the calendar grid
 
   initCalendar() {
-      let dates = this.fillDates(this.currentDate);
-      let weeks: CalendarDate[][] = [];
-      while (dates.length > 0) {
-        weeks.push(dates.splice(0, 7));
-      }
-      this.weeks = weeks;
+    let dates = this.fillDates(this.currentDate);
+    let weeks: CalendarDate[][] = [];
+    while (dates.length > 0) {
+      weeks.push(dates.splice(0, 7));
     }
-
-  generateCalendar(): void {
-    this.getForecast(this.currentDate.month()).then(() => {
-      this.initCalendar();
-    });
+    this.weeks = weeks;
   }
 
   fillDates(currentMoment: moment.Moment): CalendarDate[] {
-    let result: CalendarDate[] = [];
     const firstOfMonth = moment(currentMoment).startOf('month').day() - 1;
     const firstDayOfGrid = moment(currentMoment).startOf('month').subtract(firstOfMonth, 'days');
     const start = firstDayOfGrid.date();
-    result = _.range(start, start + 42)
+    let result = _.range(start, start + 42)
       .map((date: number): CalendarDate => {
         const d = moment(firstDayOfGrid).date(date);
         return {
@@ -151,24 +150,23 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   // generate the weather forecast
 
-  async getForecast(selectedMonth: number) {
-    if (selectedMonth === new Date().getMonth()) {
-      this.showWeatherControls = true;
+  async getForecastZipCode() {
+    if (this.isCurrentYearAndMonth()) {
       this.weatherResponse = [];
+      this.weatherService.zipCode = this.zipcodeControl.value;
+      await this.weatherService.getWeatherByZipCode().toPromise()
+        .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); },
+          this.cityInfo = response.city));
+      this.weatherDays = this.weatherResponse;
+    }
+  }
 
-      if (this.findByZipCode && !this.showZipCodeError) {
-        await this.weatherService.getWeatherByZipCode().toPromise()
-          .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city))
-          .catch(() => { this.showZipCodeError = true; });
-        //this.findByZipCode = false;
-      }
-
-      if (this.findByLocation) {
-        await this.weatherService.getWeatherByLocation().toPromise()
-          .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city));
-        //this.findByLocation = false;
-      }
-
+  async getForecastLocation() {
+    if (this.isCurrentYearAndMonth()) {
+      this.weatherResponse = [];
+      await this.weatherService.getWeatherByLocation().toPromise()
+        .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); },
+          this.cityInfo = response.city));
       this.weatherDays = this.weatherResponse;
     }
   }
@@ -178,7 +176,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       new Date(x.date).getDate() === moment.date() &&
       new Date(x.date).getMonth() === moment.month());
 
-    if (result === undefined)
+    if (result.length === 0)
       result.push(WeatherInfo.createEmptyObject());
 
     return result;
@@ -187,25 +185,17 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   // events
 
   onMonthDdlChanged(month: Month): void {
-    this.showWeatherControls = false;
     this.currentDate = moment(this.currentDate).month(((month.value) as any));
-    this.findByZipCode = true;
-    this.generateCalendar();
+    this.isCurrentYearAndMonth();
   }
 
   onYearDdlChanged(year: Year): void {
     this.currentDate = moment(this.currentDate).year(((year.value) as any));
-    if (this.selectedYear !== new Date().getFullYear() || this.selectedMonth !== new Date().getMonth()) {
-      this.showWeatherControls = false;
-    } else {
-      this.showWeatherControls = true;
-      this.findByZipCode = true;
-      this.generateCalendar();
-    }
+    this.isCurrentYearAndMonth();
   }
 
   viewDay(day: CalendarDate) {
-    if (day.weather.length !== 0) {
+    if (day.weather[0].main !== "") {
       this.dialog.open(DayWeatherInfoComponent, {
         data: {
           day: day.mDate,
@@ -221,27 +211,22 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       position => {
         this.weatherService.posLat = position.coords.latitude;
         this.weatherService.posLon = position.coords.longitude;
-        this.findByLocation = true;
-        this.generateCalendar();
+
+        this.getForecastLocation().then(() => {
+          this.initCalendar();
+        });
+        
       },
       () => {
-        this.initCalendar();
-        this.findByLocation = false;
-        this.showWeatherControls = true;
+        //TODO Change icon styles to make show it as a disabled
+        alert('Location permission blocked. Use zip code textbox to load forecast!'); 
       });
   }
 
   getWeatherByZipCode() {
-    this.showZipCodeError = false;
-    if (this.zipcodeControl.value !== null && this.zipcodeControl.value !== "") {
-      this.weatherService.zipCode = this.zipcodeControl.value;
-      this.findByZipCode = true;
-      this.showWeatherControls = true;
-      this.generateCalendar();
-    }
-    else {
-      this.showZipCodeError = true;
-    }
+    this.zipcodeControl.value !== null && this.zipcodeControl.value !== ""
+      ? this.getForecastZipCode().then(() => {this.initCalendar(); })
+      : this.showZipCodeError = true;
   }
 
 }
