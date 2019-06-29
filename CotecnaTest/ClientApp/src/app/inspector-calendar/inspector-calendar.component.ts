@@ -39,11 +39,11 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   weatherDays: WeatherInfo[] = [];
   weatherResponse: WeatherInfo[] = [];
-  cityInfo: City = undefined;
+  cityInfo: City = new City(0, "", "", undefined);
   showWeatherControls: boolean = false;
 
-  findByLocation: boolean = false;
-  findByZipCode: boolean = true;
+  findByLocation: boolean = true;
+  findByZipCode: boolean = false;
 
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
@@ -59,10 +59,9 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.weatherService.zipCode = "36201";
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
-    this.getDataResolver();
-    this.generateCalendar();
+    this.getLocationBrowser();
+    this.initCalendar();
     this.yearOptions = this.loadYearsDdl();
     this.monthOptions = this.loadMonthsDdl();
   }
@@ -70,13 +69,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.generateCalendar();
   }
-
-  getDataResolver() {
-    this.route.data.map((data: any) => data.getWeatherByZipCodeService).subscribe((response: DayWeather) => response.weather.forEach(row => {
-      this.weatherDays.push(row);
-    }, this.cityInfo = response.city));
-  }
-
+  
   // load dropdowns
 
   loadYearsDdl(): Year[] {
@@ -123,6 +116,15 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   // generate the calendar grid
 
+  initCalendar() {
+      let dates = this.fillDates(this.currentDate);
+      let weeks: CalendarDate[][] = [];
+      while (dates.length > 0) {
+        weeks.push(dates.splice(0, 7));
+      }
+      this.weeks = weeks;
+    }
+
   generateCalendar(): void {
     this.getForecast(this.currentDate.month()).then(() => {
       let dates = this.fillDates(this.currentDate);
@@ -159,7 +161,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
       this.showWeatherControls = true;
       this.weatherResponse = [];
 
-      if (this.findByZipCode) {
+      if (this.findByZipCode && !this.showZipCodeError) {
         await this.weatherService.getWeatherByZipCode().toPromise()
           .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city))
           .catch(() => { this.showZipCodeError = true; });
@@ -198,7 +200,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   onYearDdlChanged(year: Year): void {
     this.currentDate = moment(this.currentDate).year(((year.value) as any));
-    if (this.selectedYear !== new Date().getFullYear() || this.selectedMonth !== new Date().getMonth())  {
+    if (this.selectedYear !== new Date().getFullYear() || this.selectedMonth !== new Date().getMonth()) {
       this.showWeatherControls = false;
     } else {
       this.showWeatherControls = true;
@@ -220,12 +222,16 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   }
 
   getLocationBrowser() {
-    navigator.geolocation.getCurrentPosition(position => {
-      this.weatherService.posLat = position.coords.latitude;
-      this.weatherService.posLon = position.coords.longitude;
-      this.findByLocation = true;
-      this.generateCalendar();
-    });
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.weatherService.posLat = position.coords.latitude;
+        this.weatherService.posLon = position.coords.longitude;
+        this.findByLocation = true;
+        this.generateCalendar();
+      },
+      () => {
+        this.showWeatherControls = true;
+      });
   }
 
   getWeatherByZipCode() {
@@ -233,6 +239,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
     if (this.zipcodeControl.value !== null && this.zipcodeControl.value !== "") {
       this.weatherService.zipCode = this.zipcodeControl.value;
       this.findByZipCode = true;
+      this.showWeatherControls = true;
       this.generateCalendar();
     }
     else {

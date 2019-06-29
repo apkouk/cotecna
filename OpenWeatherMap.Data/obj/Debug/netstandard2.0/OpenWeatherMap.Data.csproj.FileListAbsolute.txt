@@ -1,14 +1,13 @@
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\OpenWeatherMap.Data.deps.json
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\OpenWeatherMap.Data.dll
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\OpenWeatherMap.Data.pdb
+C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Newtonsoft.Json.dll
+C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.xml
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Newtonsoft.Json.xml
-C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.csprojAssemblyReference.cache
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.csproj.CoreCompileInputs.cache
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.AssemblyInfoInputs.cache
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.AssemblyInfo.cs
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.csproj.CopyComplete
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.dll
 C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\obj\Debug\netstandard2.0\OpenWeatherMap.Data.pdb
-C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll
-C:\Users\cesco\source\CotecnaTest\OpenWeatherMap.Data\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.xml

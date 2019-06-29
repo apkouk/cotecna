@@ -10,8 +10,7 @@ import { Service } from '../service.base';
 
 export class WeatherService extends Service {
 
-  //Default is Barcelona
-  public zipCode: string = "36201"; 
+  public zipCode: string = ""; 
   public posLon: number;
   public posLat: number;
 
@@ -20,7 +19,8 @@ export class WeatherService extends Service {
   }
 
   public getWeatherByZipCode(): Observable<DayWeather> {
-    return this.http.get<DayWeather>(this.baseUrl + this.zipCode).map((res: DayWeather) => res);
+    if (this.zipCode !== "")
+      return this.http.get<DayWeather>(this.baseUrl + this.zipCode).map((res: DayWeather) => res);
   };
 
   public getWeatherByLocation(): Observable<DayWeather> {
