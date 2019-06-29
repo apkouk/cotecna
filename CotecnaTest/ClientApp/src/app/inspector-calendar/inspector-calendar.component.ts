@@ -61,7 +61,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.titleService.setTitle("Paco Rosa Cotecna Exercise");
     this.getLocationBrowser();
-    this.initCalendar();
+  
     this.yearOptions = this.loadYearsDdl();
     this.monthOptions = this.loadMonthsDdl();
   }
@@ -127,12 +127,7 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
 
   generateCalendar(): void {
     this.getForecast(this.currentDate.month()).then(() => {
-      let dates = this.fillDates(this.currentDate);
-      let weeks: CalendarDate[][] = [];
-      while (dates.length > 0) {
-        weeks.push(dates.splice(0, 7));
-      }
-      this.weeks = weeks;
+      this.initCalendar();
     });
   }
 
@@ -165,13 +160,13 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
         await this.weatherService.getWeatherByZipCode().toPromise()
           .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city))
           .catch(() => { this.showZipCodeError = true; });
-        this.findByZipCode = false;
+        //this.findByZipCode = false;
       }
 
       if (this.findByLocation) {
         await this.weatherService.getWeatherByLocation().toPromise()
           .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); }, this.cityInfo = response.city));
-        this.findByLocation = false;
+        //this.findByLocation = false;
       }
 
       this.weatherDays = this.weatherResponse;
@@ -230,6 +225,8 @@ export class InspectorCalendarComponent implements OnInit, OnChanges {
         this.generateCalendar();
       },
       () => {
+        this.initCalendar();
+        this.findByLocation = false;
         this.showWeatherControls = true;
       });
   }
