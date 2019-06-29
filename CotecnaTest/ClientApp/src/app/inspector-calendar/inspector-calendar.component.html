@@ -2,7 +2,7 @@
 <br />
 
 <div class="calendar">
-  <hr/>
+  <hr />
   <div class="calendar-navs">
     <div class="month-nav">
       <mat-form-field>
@@ -59,12 +59,8 @@
             </tr>
             <tr *ngIf="day.currentWeather !== undefined && showWeatherControls && day.currentWeather.temperature !== 0">
               <td style="text-align: -webkit-center">
-<<<<<<< HEAD
-                <span *ngIf="day.currentWeather !== undefined" class="weather-info">{{ day.currentWeather.main + " (" + day.currentWeather.temperature + "ºC)" }}</span>
-=======
                 <span class="weather-info">{{ day.currentWeather.main + " (" + day.currentWeather.temperature + "ºC)" }}</span>
 
->>>>>>> show-current-weather
                 <!--<img src="{{ day.currentWeather.icon}}" />-->
               </td>
               <td>
@@ -73,10 +69,10 @@
         </ng-container>
       </div>
     </div>
-    <hr/>
+    <hr />
   </div>
   <div class="calendar-info" *ngIf="showWeatherControls">
-    <span>* click on the weather to display forecast details</span><br/>
+    <span>* click on the weather to display forecast details</span><br />
     <div *ngIf="cityInfo.name !== ''">
       <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
     </div>
