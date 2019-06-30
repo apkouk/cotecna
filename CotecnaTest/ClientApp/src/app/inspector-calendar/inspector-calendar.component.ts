@@ -26,7 +26,7 @@ import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.com
 })
 
 export class InspectorCalendarComponent implements OnInit, AfterViewInit {
-  
+
   currentDate = moment();
   dayNames = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
   weeks: CalendarDate[][] = [];
@@ -154,7 +154,10 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
       this.weatherService.zipCode = this.zipcodeControl.value;
       await this.weatherService.getWeatherByZipCode().toPromise()
         .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); },
-          this.cityInfo = response.city));
+          this.cityInfo = response.city))
+        .catch(() => {
+          this.showHideZipCodeError(true);;
+        });
       this.weatherDays = this.weatherResponse;
     }
   }
@@ -191,12 +194,25 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
         baseDate.getHours() < new Date().getHours() &&
         new Date().getHours() < baseDate.getHours() + 3) {
         return x;
-      };})[0];
+      };
+    })[0];
+    
+    if (result === undefined)
+      result = this.weatherDays.filter(x => {
+        let baseDate = new Date(x.date);
 
-      if (result === undefined)
-        result = WeatherInfo.createEmptyObject();
+        if (baseDate.getMonth() === moment.month() &&
+          baseDate.getDate() === moment.date() &&
+          baseDate.getHours() > new Date().getHours() &&
+          new Date().getHours() < baseDate.getHours() + 3) {
+          return x;
+        };
+      })[0];
 
-      return result;
+    if (result === undefined)
+      result = WeatherInfo.createEmptyObject();
+
+    return result;
   }
 
   setCurrentWeather() {
@@ -235,6 +251,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
 
         this.getForecastLocation().then(() => {
           this.initCalendar();
+          this.showZipCodeError = false;
         });
 
       },
@@ -244,9 +261,18 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
       });
   }
 
+  showHideZipCodeError(show: boolean) {
+    this.showZipCodeError = show;
+    if (!show)
+      this.cityInfo.name = "";
+  }
+
   getWeatherByZipCode() {
+    this.showHideZipCodeError(false);
     this.zipcodeControl.value !== null && this.zipcodeControl.value !== ""
-      ? this.getForecastZipCode().then(() => { this.initCalendar(); this.showZipCodeError = false; })
-      : this.showZipCodeError = true;
+      ? this.getForecastZipCode()
+        .then(() => { this.initCalendar() })
+        .catch(() => this.showHideZipCodeError(true) )
+      : this.showHideZipCodeError(true);
   }
 }
