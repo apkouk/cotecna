@@ -2,6 +2,7 @@
 <br />
 
 <div class="calendar">
+  <hr/>
   <div class="calendar-navs">
     <div class="month-nav">
       <mat-form-field>
@@ -20,9 +21,9 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field style="margin-left: 50px; width:200px !important" *ngIf="showWeatherControls">
+      <mat-form-field style="margin-left: 50px; width: 200px !important" *ngIf="showWeatherControls">
         <input matInput placeholder="Spanish Zip Code" [formControl]="zipcodeControl">
-        <mat-hint *ngIf="showZipCodeError" style="color:red">Valid spanish zip code <strong>required</strong></mat-hint>        
+        <mat-hint *ngIf="showZipCodeError" style="color: red">Valid spanish zip code <strong>required</strong></mat-hint>
       </mat-form-field>
       <div *ngIf="showWeatherControls">
         <button mat-button (click)="getWeatherByZipCode()" class="location-btn"><mat-icon aria-hidden="True">search</mat-icon></button>
@@ -41,7 +42,7 @@
     <div class="weeks">
       <div *ngFor="let week of weeks" class="week">
         <ng-container *ngFor="let day of week">
-          <table style="cursor:pointer;" (click)="viewDay(day)">
+          <table style="cursor: pointer;" (click)="viewDay(day)">
             <tr>
               <td>
                 <div class="week-date disabled" *ngIf="!isSelectedMonth(day.mDate)">
@@ -56,9 +57,9 @@
                 </div>
               </td>
             </tr>
-            <tr *ngIf="day.weather[0] !== undefined && showWeatherControls && day.weather[0].temperature !== 0">
+            <tr *ngIf="day.currentWeather !== undefined && showWeatherControls && day.currentWeather.temperature !== 0">
               <td style="text-align: -webkit-center">
-                <span *ngIf="day.currentWeather !== undefined" class="weather-info">{{ day.currentWeather.main + " (" + day.currentWeather.temperature + "ºC)" }}</span>
+                <span class="weather-info">{{ day.currentWeather.main + " (" + day.currentWeather.temperature + "ºC)" }}</span>
                 <!--<img src="{{ day.currentWeather.icon}}" />-->
               </td>
               <td>
@@ -67,10 +68,11 @@
         </ng-container>
       </div>
     </div>
+    <hr/>
   </div>
-
-  <div class="calendar-info" *ngIf="showWeatherControls" >
-    <span>* click on the weather to display forecast details</span><br />
+ 
+  <div class="calendar-info" *ngIf="showWeatherControls">
+    <span>* click on the weather to display forecast details</span><br/>
     <div *ngIf="cityInfo.name !== ''">
       <span>Weather forecast for <b>{{ cityInfo.name }} ({{ cityInfo.country }})</b></span>
     </div>
