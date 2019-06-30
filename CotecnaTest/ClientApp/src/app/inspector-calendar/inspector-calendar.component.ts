@@ -26,7 +26,7 @@ import { DayWeatherInfoComponent } from './day-weather-info/day-weather-info.com
 })
 
 export class InspectorCalendarComponent implements OnInit, AfterViewInit {
-
+  
   currentDate = moment();
   dayNames = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
   weeks: CalendarDate[][] = [];
@@ -42,9 +42,6 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   weatherResponse: WeatherInfo[] = [];
   cityInfo: City = new City(0, "", "", undefined);
   showWeatherControls: boolean = true;
-
-  findByLocation: boolean = true;
-  findByZipCode: boolean = false;
 
   @Input() selectedDates: CalendarDate[] = [];
   @Output() onSelectDate = new EventEmitter<CalendarDate>();
@@ -127,6 +124,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
     let weeks: CalendarDate[][] = [];
     while (dates.length > 0) {
       weeks.push(dates.splice(0, 7));
+      //this.setCurrentWeather();
     }
     this.weeks = weeks;
   }
@@ -159,6 +157,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
         .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); },
           this.cityInfo = response.city));
       this.weatherDays = this.weatherResponse;
+      //this.setCurrentWeather();
     }
   }
 
@@ -169,6 +168,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
         .then((response: DayWeather) => response.weather.forEach(row => { this.weatherResponse.push(row); },
           this.cityInfo = response.city));
       this.weatherDays = this.weatherResponse;
+      //this.setCurrentWeather();
     }
   }
 
@@ -184,11 +184,31 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   }
 
   getCurrentWeather(moment): WeatherInfo {
-    return this.weatherDays.find(x =>
-      new Date(x.date).getDate() === moment.date() &&
-      new Date(x.date).getMonth() === moment.month() &&
-      new Date(x.date).getHours() < new Date().getHours() &&
-      new Date().getHours() < new Date(x.date).getHours() + 3);
+    let result: WeatherInfo;
+
+
+    result = this.weatherDays.filter(x => {
+
+      let baseDate = new Date(x.date);
+
+      if (baseDate.getMonth() === moment.month() &&
+        baseDate.getDate() === moment.date() &&
+        baseDate.getHours() < new Date().getHours() &&
+        new Date().getHours() < baseDate.getHours() + 3) {
+        return x;
+      };
+
+    })[0];
+
+      if (result === undefined)
+        result = WeatherInfo.createEmptyObject();
+
+      return result;
+    
+  }
+
+  setCurrentWeather() {
+    this.weeks.forEach(x => x.forEach(y => y.currentWeather = this.getCurrentWeather(y.mDate)));
   }
 
   // events
@@ -234,7 +254,7 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
 
   getWeatherByZipCode() {
     this.zipcodeControl.value !== null && this.zipcodeControl.value !== ""
-      ? this.getForecastZipCode().then(() => { this.initCalendar(); })
+      ? this.getForecastZipCode().then(() => { this.initCalendar(); this.showZipCodeError = false; })
       : this.showZipCodeError = true;
   }
 
