@@ -199,10 +199,6 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
     return result[result.length - 1] === undefined ? WeatherInfo.createEmptyObject() : result[result.length - 1];
   }
 
-  setCurrentWeather() {
-    this.weeks.forEach(x => x.forEach(y => y.currentWeather = this.getCurrentWeather(y.mDate)));
-  }
-
   // events
 
   onMonthDdlChanged(month: Month): void {
