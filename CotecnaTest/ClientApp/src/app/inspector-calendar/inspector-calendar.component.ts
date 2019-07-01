@@ -184,27 +184,19 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   }
 
   getCurrentWeather(moment): WeatherInfo {
-    let result: WeatherInfo;
-
-
-    result = this.weatherDays.filter(x => {
-
+    let result = this.weatherDays.filter(x => {
+      let res: WeatherInfo[] = [];
       let baseDate = new Date(x.date);
 
       if (baseDate.getMonth() === moment.month() &&
         baseDate.getDate() === moment.date() &&
-        baseDate.getHours() < new Date().getHours() &&
-        new Date().getHours() < baseDate.getHours() + 3) {
-        return x;
+        baseDate.getHours() <= new Date().getHours()) {
+        res.push(x);
+        return res;
       };
+    });
 
-    })[0];
-
-      if (result === undefined)
-        result = WeatherInfo.createEmptyObject();
-
-      return result;
-    
+    return result[result.length - 1] === undefined ? WeatherInfo.createEmptyObject() : result[result.length - 1];
   }
 
   setCurrentWeather() {
