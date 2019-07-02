@@ -129,8 +129,8 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   }
 
   fillDates(currentMoment: moment.Moment): CalendarDate[] {
-    const firstOfMonth = moment(currentMoment).startOf('month').day() - 1;
-    const firstDayOfGrid = moment(currentMoment).startOf('month').subtract(firstOfMonth, 'days');
+    let firstOfMonth = moment(currentMoment).startOf('month').day() - 1;
+    const firstDayOfGrid = moment(currentMoment).startOf('month').subtract(firstOfMonth === -1 ? 6 : firstOfMonth, 'days');
     const start = firstDayOfGrid.date();
     let result = _.range(start, start + 42)
       .map((date: number): CalendarDate => {
@@ -202,13 +202,15 @@ export class InspectorCalendarComponent implements OnInit, AfterViewInit {
   // events
 
   onMonthDdlChanged(month: Month): void {
-    this.currentDate = moment(this.currentDate).month(((month.value) as any));
+    this.currentDate = moment(this.currentDate).month(((month.value) as any)).startOf('month');
     this.isCurrentYearAndMonth();
+    this.initCalendar();
   }
 
   onYearDdlChanged(year: Year): void {
     this.currentDate = moment(this.currentDate).year(((year.value) as any));
     this.isCurrentYearAndMonth();
+    this.initCalendar();
   }
 
   viewDay(day: CalendarDate) {
